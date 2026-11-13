@@ -1,2 +1,5 @@
-# cadastro-itens
-Sistema simples de cadastro e identificação de itens, com edição, filtros, classificação, ordenação e armazenamento local.
+# Cadastro de Itens
+
+## Sistema simples para cadastrar, editar, organizar e imprimir itens.
+
+## Desenvolvido em HTML, CSS e JavaScript, com armazenamento local no navegador.
