@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cadastros</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+--green:#16834a;
+--green2:#20a45e;
+--yellow:#f4c542;
+--bg:#edf2ee;
+--text:#25372d;
+--border:#dce7de;
+}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+font:14px Arial,sans-serif;
+height:100vh;
+overflow:hidden;
+}
+
+.app{
+height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+.content{
+flex:1;
+min-height:0;
+padding:18px 24px;
+display:flex;
+flex-direction:column;
+}
+
+.panel{
+flex:1;
+min-height:0;
+background:#fff;
+border:1px solid var(--border);
+border-radius:10px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+box-shadow:0 3px 14px #244b320d;
+}
+
+/* BARRA SUPERIOR */
+
+.toolbar{
+min-height:76px;
+padding:12px 20px;
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+gap:12px;
+background:#fff;
+}
+
+.search-wrap{
+position:relative;
+flex:1;
+min-width:200px;
+}
+
+.search{
+width:100%;
+height:44px;
+padding:0 15px 0 40px;
+border:1px solid #d5e2d8;
+border-radius:7px;
+outline:none;
+font-size:14px;
+background:#f8fbf8;
+}
+
+.search-icon{
+position:absolute;
+left:14px;
+top:13px;
+color:var(--green);
+font-size:17px;
+}
+
+.search:focus,input:focus,select:focus{
+border-color:var(--green2);
+box-shadow:0 0 0 2px #20a45e18;
+}
+
+.add,.print{
+height:44px;
+padding:0 20px;
+border:0;
+border-radius:7px;
+font-size:13px;
+font-weight:700;
+cursor:pointer;
+white-space:nowrap;
+}
+
+.add{
+background:var(--yellow);
+color:#34472e;
+}
+
+.print{
+background:#e8f3eb;
+color:#24613d;
+}
+
+.filter{
+height:40px;
+padding:0 12px;
+border:1px solid #d5e2d8;
+border-radius:7px;
+background:#f8fbf8;
+color:#35483b;
+outline:none;
+font-size:13px;
+cursor:pointer;
+}
+
+/* FORMULÁRIO */
+
+.form{
+display:none;
+padding:18px 22px;
+background:#f4f9f4;
+border-bottom:1px solid var(--border);
+}
+
+.form.open{display:block}
+
+.form-title{
+font-size:14px;
+font-weight:700;
+margin-bottom:14px;
+color:#24613d;
+}
+
+.fields{
+display:grid;
+grid-template-columns:170px 1fr 220px;
+gap:14px;
+}
+
+input:not(.search){
+width:100%;
+height:42px;
+padding:0 12px;
+border:1px solid #d5e2d8;
+border-radius:7px;
+outline:none;
+background:#fff;
+color:#25372d;
+font-size:14px;
+}
+
+.actions{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+margin-top:14px;
+}
+
+.cancel,.save{
+height:38px;
+padding:0 20px;
+border:0;
+border-radius:7px;
+font-weight:700;
+cursor:pointer;
+}
+
+.cancel{
+background:#e5ede6;
+color:#526456;
+}
+
+.save{
+background:var(--green);
+color:#fff;
+}
+
+/* TABELA */
+
+.table-area{
+flex:1;
+min-height:0;
+overflow:auto;
+padding:0 12px;
+}
+
+table{
+width:100%;
+border-collapse:separate;
+border-spacing:0;
+table-layout:fixed;
+}
+
+thead{
+position:sticky;
+top:0;
+z-index:2;
+}
+
+th{
+height:48px;
+background:#edf4ee;
+color:#42684c;
+font-size:12px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.5px;
+white-space:nowrap;
+}
+
+th,td{
+padding:10px 16px;
+text-align:left;
+border-bottom:1px solid #e7ede8;
+}
+
+td{
+font-size:14px;
+color:#35483b;
+height:52px;
+overflow-wrap:anywhere;
+}
+
+tbody tr:nth-child(even){background:#fafcf9}
+tbody tr:hover{background:#f0f7f1}
+
+td:first-child{
+color:var(--green);
+font-weight:700;
+font-variant-numeric:tabular-nums;
+}
+
+.empty{
+text-align:center!important;
+padding:70px 15px!important;
+color:#9aa99d!important;
+font-weight:400!important;
+}
+
+/* ORDENAÇÃO */
+
+.sort-btn{
+display:inline-flex;
+align-items:center;
+gap:7px;
+padding:5px 0;
+border:0;
+background:transparent;
+color:inherit;
+font:inherit;
+text-transform:inherit;
+letter-spacing:inherit;
+cursor:pointer;
+}
+
+.sort-btn:hover{color:var(--green)}
+
+.sort-icon{
+font-size:13px;
+color:#8ba193;
+}
+
+.sort-btn.active .sort-icon{
+color:var(--green);
+}
+
+/* EDIÇÃO */
+
+.editable{cursor:text}
+
+.editable:hover{
+outline:1px dashed #91b59a;
+outline-offset:-3px;
+}
+
+.cell-edit{
+width:100%;
+height:34px;
+padding:5px 8px;
+border:1px solid var(--green2);
+border-radius:5px;
+outline:none;
+font:14px Arial,sans-serif;
+background:#fff;
+color:#25372d;
+}
+
+/* TIPO */
+
+.type-select{
+height:32px;
+min-width:120px;
+max-width:100%;
+padding:0 8px;
+border:1px solid #d5e2d8;
+border-radius:6px;
+background:#fff;
+color:#35483b;
+font-size:12px;
+outline:none;
+cursor:pointer;
+}
+
+.type-text{display:none}
+
+/* RISCADOS */
+
+tr.riscado td{
+color:#999!important;
+text-decoration:line-through;
+background:#f1f1f1;
+}
+
+tr.riscado td select,
+tr.riscado td button{
+text-decoration:none;
+}
+
+/* AÇÕES */
+
+.row-actions{
+display:flex;
+align-items:center;
+gap:7px;
+}
+
+.btn-delete,.btn-strike{
+height:30px;
+padding:0 10px;
+border:0;
+border-radius:5px;
+font-size:11px;
+font-weight:700;
+cursor:pointer;
+white-space:nowrap;
+}
+
+.btn-delete{
+background:#fceaea;
+color:#b43c3c;
+}
+
+.btn-strike{
+background:#edf0ed;
+color:#526456;
+}
+
+.btn-strike.active{
+background:#dce5dc;
+color:#16834a;
+}
+
+/* RODAPÉ */
+
+.footer{
+min-height:42px;
+border-top:1px solid var(--border);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+color:#89978d;
+font-size:12px;
+background:#fafcfb;
+}
+
+/* ROLAGEM */
+
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:#f0f4f0}
+::-webkit-scrollbar-thumb{
+background:#91b59a;
+border-radius:10px;
+border:2px solid #f0f4f0;
+}
+
+/* DESKTOP */
+
+@media(min-width:1200px){
+
+.content{padding:14px 22px}
+
+th,td{padding-left:20px;padding-right:20px}
+
+td{height:54px}
+
+}
+
+/* TABLET E CELULAR */
+
+@media(max-width:850px){
+
+.content{padding:10px}
+
+.toolbar{
+padding:12px;
+flex-wrap:wrap;
+}
+
+.search-wrap{flex:1 1 100%}
+
+.filter{flex:1}
+
+.fields{grid-template-columns:1fr}
+
+.table-area{overflow:auto}
+
+table{min-width:850px}
+
+}
+
+/* IMPRESSÃO */
+
+@media print{
+
+@page{
+size:A4 portrait;
+margin:10mm;
+}
+
+html,body{
+width:100%;
+height:auto;
+margin:0;
+padding:0;
+overflow:visible;
+background:#fff!important;
+color:#000!important;
+font-family:Arial,sans-serif;
+}
+
+.app,.content,.panel{
+display:block;
+width:100%;
+height:auto;
+min-height:0;
+margin:0;
+padding:0;
+border:0;
+border-radius:0;
+box-shadow:none;
+overflow:visible;
+background:#fff!important;
+}
+
+.toolbar,.form,.footer,.no-print{
+display:none!important;
+}
+
+.table-area{
+display:block;
+width:100%;
+height:auto;
+min-height:0;
+padding:0;
+overflow:visible;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+table-layout:fixed;
+}
+
+thead{
+display:table-header-group;
+position:static;
+}
+
+tr{
+break-inside:avoid;
+page-break-inside:avoid;
+}
+
+th,td{
+height:auto;
+padding:7px;
+border:1px solid #000!important;
+background:#fff!important;
+color:#000!important;
+font-size:10pt;
+font-weight:400;
+}
+
+th{
+font-weight:700;
+text-transform:none;
+letter-spacing:0;
+}
+
+.sort-btn{
+color:#000!important;
+}
+
+.sort-icon{display:none}
+
+.type-select{display:none!important}
+
+.type-text{
+display:inline!important;
+color:#000!important;
+font-size:10pt;
+text-decoration:none!important;
+}
+
+tr.riscado td{
+color:#000!important;
+background:#fff!important;
+text-decoration:line-through!important;
+}
+
+td:first-child{
+color:#000!important;
+font-weight:400;
+}
+
+.empty{padding:20px!important}
+
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+<section class="content">
+<section class="panel">
+
+<div class="toolbar">
+
+<div class="search-wrap">
+<span class="search-icon">⌕</span>
+<input class="search" id="search"
+placeholder="Buscar por ID, nome, tipo ou valor..."
+autocomplete="off">
+</div>
+
+<select class="filter" id="filter">
+<option value="todos">Todos os tipos</option>
+<option value="normal">Normal</option>
+<option value="combo">Combo</option>
+<option value="como_mais">Como +</option>
+<option value="combo_2_por">Combo 2 por</option>
+<option value="riscado">Riscados</option>
+</select>
+
+<button class="add" id="btnAdd">＋ Add</button>
+<button class="print" id="btnPrint">Imprimir</button>
+
+</div>
+
+<div class="form" id="form">
+
+<div class="form-title">Novo cadastro</div>
+
+<div class="fields">
+<input id="id" placeholder="ID *" inputmode="numeric">
+<input id="nome" placeholder="Nome *">
+<input id="valor" placeholder="Valor (opcional)">
+</div>
+
+<div class="actions">
+<button class="cancel" id="btnCancel">Cancelar</button>
+<button class="save" id="btnSave">Salvar ↵</button>
+</div>
+
+</div>
+
+<div class="table-area" id="tableArea">
+
+<table>
+
+<thead>
+<tr>
+<th style="width:10%">
+<button class="sort-btn" data-sort="id">ID <span class="sort-icon">↕</span></button>
+</th>
+
+<th style="width:34%">
+<button class="sort-btn" data-sort="nome">Nome <span class="sort-icon">↕</span></button>
+</th>
+
+<th style="width:19%">
+<button class="sort-btn" data-sort="tipo">Tipo <span class="sort-icon">↕</span></button>
+</th>
+
+<th style="width:17%">
+<button class="sort-btn" data-sort="valor">Valor <span class="sort-icon">↕</span></button>
+</th>
+
+<th class="no-print" style="width:20%">
+Ações
+</th>
+</tr>
+</thead>
+
+<tbody id="list"></tbody>
+
+</table>
+
+</div>
+
+<div class="footer">
+<span id="status">Sistema pronto</span>
+<span id="total">0 registros</span>
+</div>
+
+</section>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+
+const STORAGE_KEY="cadastros_itens_v1";
+
+let items=carregarDados();
+let filtered=[];
+let searchTimer=null;
+
+let sortColumn="id";
+let sortDirection="asc";
+
+const BATCH_SIZE=100;
+
+const TIPOS={
+normal:"Normal",
+combo:"Combo",
+como_mais:"Como +",
+combo_2_por:"Combo 2 por"
+};
+
+/* ARMAZENAMENTO */
+
+function carregarDados(){
+
+try{
+
+const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+
+if(!Array.isArray(data))return [];
+
+return data.map(item=>({
+...item,
+tipo:item.tipo||(item.combo?"combo":"normal"),
+riscado:item.riscado===true
+}));
+
+}catch(error){
+
+console.error(error);
+return [];
+
+}
+
+}
+
+function salvarDados(){
+
+try{
+
+localStorage.setItem(STORAGE_KEY,JSON.stringify(items));
+$("status").textContent="Dados salvos";
+return true;
+
+}catch(error){
+
+$("status").textContent="Erro ao salvar";
+alert("Não foi possível salvar os dados.");
+return false;
+
+}
+
+}
+
+function criarBusca(item){
+
+return [
+item.id,
+item.nome,
+item.valor,
+TIPOS[item.tipo]||"Normal",
+item.riscado?"riscado":""
+].join(" ").toLowerCase();
+
+}
+
+/* FORMULÁRIO */
+
+function toggleForm(show){
+
+$("form").classList.toggle("open",show);
+
+if(show)$("id").focus();
+else clearForm();
+
+}
+
+function clearForm(){
+
+["id","nome","valor"].forEach(k=>$(k).value="");
+
+}
+
+$("btnAdd").addEventListener("click",()=>{
+toggleForm(!$("form").classList.contains("open"));
+});
+
+$("btnCancel").addEventListener("click",()=>{
+toggleForm(false);
+$("search").focus();
+});
+
+/* CAMPOS */
+
+$("id").addEventListener("input",function(){
+this.value=this.value.replace(/\D/g,"");
+});
+
+$("valor").addEventListener("input",function(){
+
+let n=this.value.replace(/\D/g,"");
+
+this.value=n?
+"R$ "+(Number(n)/100).toFixed(2).replace(".",","):"";
+
+});
+
+/* CADASTRO */
+
+$("btnSave").addEventListener("click",addItem);
+
+["id","nome","valor"].forEach(key=>{
+
+$(key).addEventListener("keydown",e=>{
+
+if(e.key==="Enter"){
+e.preventDefault();
+addItem();
+}
+
+});
+
+});
+
+function addItem(){
+
+const id=$("id").value.trim();
+const nome=$("nome").value.trim();
+const valor=$("valor").value.trim();
+
+if(!id||!nome){
+alert("ID e Nome são obrigatórios.");
+return;
+}
+
+if(items.some(item=>item.id===id)){
+alert("Este ID já existe.");
+$("id").focus();
+return;
+}
+
+const novo={
+id,nome,valor,
+tipo:"normal",
+riscado:false
+};
+
+items.push(novo);
+
+if(!salvarDados()){
+items.pop();
+return;
+}
+
+$("search").value="";
+$("filter").value="todos";
+
+toggleForm(false);
+aplicarFiltros();
+
+$("status").textContent="Cadastro realizado";
+
+}
+
+/* EDIÇÃO DIRETA */
+
+function iniciarEdicao(td,item,campo){
+
+if(td.querySelector("input"))return;
+
+const original=item[campo]||"";
+const input=document.createElement("input");
+
+input.className="cell-edit";
+input.value=original;
+
+td.textContent="";
+td.appendChild(input);
+
+input.focus();
+input.select();
+
+let finalizado=false;
+
+function finalizar(salvar=true){
+
+if(finalizado)return;
+
+const novo=input.value.trim();
+
+if(salvar&&novo!==original){
+
+if(campo==="id"&&items.some(x=>x!==item&&x.id===novo)){
+alert("Este ID já existe.");
+input.focus();
+return;
+}
+
+if(campo==="id"&&!/^\d+$/.test(novo)){
+alert("O ID deve conter apenas números.");
+input.focus();
+return;
+}
+
+if(campo==="nome"&&!novo){
+alert("O nome não pode ficar vazio.");
+input.focus();
+return;
+}
+
+item[campo]=novo;
+
+if(!salvarDados())item[campo]=original;
+
+}
+
+finalizado=true;
+aplicarFiltros();
+
+}
+
+input.addEventListener("keydown",e=>{
+
+if(e.key==="Enter"){
+e.preventDefault();
+finalizar(true);
+}
+
+if(e.key==="Escape"){
+finalizado=true;
+aplicarFiltros();
+}
+
+});
+
+input.addEventListener("blur",()=>finalizar(true));
+
+}
+
+/* EXCLUSÃO */
+
+function excluirItem(id){
+
+const index=items.findIndex(item=>item.id===id);
+
+if(index===-1)return;
+
+const removido=items.splice(index,1)[0];
+
+if(!salvarDados()){
+items.splice(index,0,removido);
+return;
+}
+
+aplicarFiltros();
+$("status").textContent="Item excluído";
+
+}
+
+/* TIPO */
+
+function alterarTipo(id,tipo){
+
+const item=items.find(item=>item.id===id);
+
+if(!item)return;
+
+const anterior=item.tipo;
+item.tipo=tipo;
+
+if(!salvarDados())item.tipo=anterior;
+
+aplicarFiltros();
+
+}
+
+/* RISCAR */
+
+function alternarRisco(id){
+
+const item=items.find(item=>item.id===id);
+
+if(!item)return;
+
+const anterior=item.riscado;
+item.riscado=!item.riscado;
+
+if(!salvarDados()){
+item.riscado=anterior;
+return;
+}
+
+aplicarFiltros();
+
+}
+
+/* ORDENAÇÃO */
+
+function valorOrdenacao(item,coluna){
+
+if(coluna==="id")return item.id;
+if(coluna==="nome")return item.nome;
+if(coluna==="tipo")return TIPOS[item.tipo]||"Normal";
+if(coluna==="valor")return item.valor||"";
+
+return "";
+
+}
+
+function ordenarDados(){
+
+filtered.sort((a,b)=>{
+
+const va=valorOrdenacao(a,sortColumn);
+const vb=valorOrdenacao(b,sortColumn);
+
+let resultado;
+
+if(sortColumn==="id"){
+
+resultado=Number(va)-Number(vb);
+
+}else if(sortColumn==="valor"){
+
+const na=Number(String(va).replace(/\D/g,""))||0;
+const nb=Number(String(vb).replace(/\D/g,""))||0;
+
+resultado=na-nb;
+
+}else{
+
+resultado=String(va).localeCompare(String(vb),"pt-BR",{
+numeric:true,
+sensitivity:"base"
+});
+
+}
+
+return sortDirection==="asc"?resultado:-resultado;
+
+});
+
+atualizarIndicadoresOrdenacao();
+
+}
+
+function atualizarIndicadoresOrdenacao(){
+
+document.querySelectorAll(".sort-btn").forEach(btn=>{
+
+const ativo=btn.dataset.sort===sortColumn;
+
+btn.classList.toggle("active",ativo);
+
+btn.querySelector(".sort-icon").textContent=
+ativo?(sortDirection==="asc"?"↑":"↓"):"↕";
+
+});
+
+}
+
+document.querySelectorAll(".sort-btn").forEach(btn=>{
+
+btn.addEventListener("click",()=>{
+
+const coluna=btn.dataset.sort;
+
+if(sortColumn===coluna){
+sortDirection=sortDirection==="asc"?"desc":"asc";
+}else{
+sortColumn=coluna;
+sortDirection="asc";
+}
+
+aplicarFiltros();
+
+});
+
+});
+
+/* FILTROS */
+
+function aplicarFiltros(){
+
+const termo=$("search").value.trim().toLowerCase();
+const tipo=$("filter").value;
+
+filtered=items.filter(item=>{
+
+const correspondeTexto=!termo||criarBusca(item).includes(termo);
+
+let correspondeTipo=true;
+
+if(tipo==="riscado"){
+correspondeTipo=item.riscado;
+}else if(tipo==="normal"){
+correspondeTipo=item.tipo==="normal"&&!item.riscado;
+}else if(tipo!=="todos"){
+correspondeTipo=item.tipo===tipo&&!item.riscado;
+}
+
+return correspondeTexto&&correspondeTipo;
+
+});
+
+ordenarDados();
+render();
+
+}
+
+$("search").addEventListener("input",()=>{
+
+clearTimeout(searchTimer);
+searchTimer=setTimeout(aplicarFiltros,100);
+
+});
+
+$("filter").addEventListener("change",aplicarFiltros);
+
+/* RENDERIZAÇÃO */
+
+function render(){
+
+const list=$("list");
+
+$("total").textContent=items.length+" registros";
+
+list.replaceChildren();
+
+if(!filtered.length){
+
+const tr=document.createElement("tr");
+const td=document.createElement("td");
+
+td.colSpan=5;
+td.className="empty";
+
+td.textContent=items.length?
+"Nenhum item encontrado.":"Nenhum item cadastrado.";
+
+tr.appendChild(td);
+list.appendChild(tr);
+return;
+
+}
+
+let index=0;
+
+function renderBatch(){
+
+const fragment=document.createDocumentFragment();
+const end=Math.min(index+BATCH_SIZE,filtered.length);
+
+for(;index<end;index++){
+
+const item=filtered[index];
+const tr=document.createElement("tr");
+
+if(item.riscado)tr.classList.add("riscado");
+
+/* ID */
+
+const tdId=document.createElement("td");
+tdId.textContent=item.id;
+tdId.className="editable";
+tdId.title="Dois cliques para editar";
+
+tdId.addEventListener("dblclick",()=>{
+iniciarEdicao(tdId,item,"id");
+});
+
+/* NOME */
+
+const tdNome=document.createElement("td");
+tdNome.textContent=item.nome;
+tdNome.className="editable";
+tdNome.title="Dois cliques para editar";
+
+tdNome.addEventListener("dblclick",()=>{
+iniciarEdicao(tdNome,item,"nome");
+});
+
+/* TIPO */
+
+const tdTipo=document.createElement("td");
+const select=document.createElement("select");
+
+select.className="type-select no-print";
+
+Object.entries(TIPOS).forEach(([key,label])=>{
+
+const option=document.createElement("option");
+option.value=key;
+option.textContent=label;
+select.appendChild(option);
+
+});
+
+select.value=item.tipo||"normal";
+
+select.addEventListener("change",()=>{
+alterarTipo(item.id,select.value);
+});
+
+const typeText=document.createElement("span");
+typeText.className="type-text";
+typeText.textContent=TIPOS[item.tipo]||"Normal";
+
+tdTipo.append(select,typeText);
+
+/* VALOR */
+
+const tdValor=document.createElement("td");
+tdValor.textContent=item.valor||"—";
+tdValor.className="editable";
+tdValor.title="Dois cliques para editar";
+
+tdValor.addEventListener("dblclick",()=>{
+iniciarEdicao(tdValor,item,"valor");
+});
+
+/* AÇÕES */
+
+const tdActions=document.createElement("td");
+tdActions.className="no-print";
+
+const actions=document.createElement("div");
+actions.className="row-actions";
+
+const btnStrike=document.createElement("button");
+btnStrike.className="btn-strike"+(item.riscado?" active":"");
+btnStrike.textContent=item.riscado?"Desriscar":"Riscar";
+
+btnStrike.addEventListener("click",()=>{
+alternarRisco(item.id);
+});
+
+const btnDelete=document.createElement("button");
+btnDelete.className="btn-delete";
+btnDelete.textContent="Excluir";
+
+btnDelete.addEventListener("click",()=>{
+excluirItem(item.id);
+});
+
+actions.append(btnStrike,btnDelete);
+tdActions.appendChild(actions);
+
+tr.append(tdId,tdNome,tdTipo,tdValor,tdActions);
+fragment.appendChild(tr);
+
+}
+
+list.appendChild(fragment);
+
+if(index<filtered.length){
+requestAnimationFrame(renderBatch);
+}
+
+}
+
+renderBatch();
+$("tableArea").scrollTop=0;
+
+}
+
+/* IMPRESSÃO */
+
+$("btnPrint").addEventListener("click",()=>{
+window.print();
+});
+
+/* INICIALIZAÇÃO */
+
+window.addEventListener("load",()=>{
+
+items.forEach(item=>{
+
+if(!item.tipo)item.tipo=item.combo?"combo":"normal";
+if(typeof item.riscado!=="boolean")item.riscado=false;
+
+});
+
+salvarDados();
+aplicarFiltros();
+$("search").focus();
+
+});
+</script>
+
+</body>
+</html>
